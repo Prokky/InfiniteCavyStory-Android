@@ -10,7 +10,8 @@ import android.view.View
 
 
 /**
- * Created by alexander.roman on 11.08.2017.
+ * An implementation of terminal view for oldschool games
+ * @author Alexander Roman
  */
 
 class AsciiPanelView : View {
@@ -166,6 +167,49 @@ class AsciiPanelView : View {
             writeChar(string[i], x + i, y, glyphColor)
         }
     }
+
+    fun clear() {
+        clearRect(' ', 0, 0, panelWidth, panelHeight, basicGlyphColor)
+    }
+
+    fun clear(character: Char) {
+        clearRect(character, 0, 0, panelWidth, panelHeight, basicGlyphColor)
+    }
+
+    fun clear(character: Char, color: Int) {
+        clearRect(character, 0, 0, panelWidth, panelHeight, color)
+    }
+
+    fun clearRect(character: Char, x: Int, y: Int, width: Int, height: Int) {
+        if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be within range [0,$panelWidth).")
+        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be within range [0,$panelHeight).")
+        if (width < 1) throw IllegalArgumentException("width $width must be greater than 0.")
+        if (height < 1) throw IllegalArgumentException("height $height must be greater than 0.")
+        if (x + width > panelWidth) throw IllegalArgumentException("x + width " + (x + width) + " must be less than " + (panelWidth + 1) + ".")
+        if (y + height > panelHeight) throw IllegalArgumentException("y + height " + (y + height) + " must be less than " + (panelHeight + 1) + ".")
+
+        clearRect(character, x, y, width, height, basicGlyphColor)
+    }
+
+    fun clearRect(character: Char, x: Int, y: Int, width: Int, height: Int, color: Int) {
+        if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be within range [0,$panelWidth)")
+        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be within range [0,$panelHeight)")
+        if (width < 1) throw IllegalArgumentException("width $width must be greater than 0.")
+        if (height < 1) throw IllegalArgumentException("height $height must be greater than 0.")
+        if (x + width > panelWidth) throw IllegalArgumentException("x + width " + (x + width) + " must be less than " + (panelWidth + 1) + ".")
+        if (y + height > panelHeight) throw IllegalArgumentException("y + height " + (y + height) + " must be less than " + (panelHeight + 1) + ".")
+
+        val originalCursorX = cursorX
+        val originalCursorY = cursorY
+        for (xo in x..x + width - 1) {
+            for (yo in y..y + height - 1) {
+                writeChar(character, xo, yo, color)
+            }
+        }
+        cursorX = originalCursorX
+        cursorY = originalCursorY
+    }
+
 
     class ColoredChar(var glyph: Char, var color: Int)
 }
