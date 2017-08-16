@@ -7,7 +7,7 @@
     tools:context="com.prokkypew.infinitecavystory.MainActivity">
 
     <com.prokkypew.asciipanelview.AsciiPanelView
-        android:id="@+id/panel"
+        android:id="@+id/panelView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultGlyphColor="#ffffff"

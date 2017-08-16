@@ -17,15 +17,14 @@ class MainActivity : AppCompatActivity(), AsciiPanelView.OnCharClickedListener {
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_main)
 
-        panel.onCharClickedListener = this
+        panelView.onCharClickedListener = this
 
         currentScreen = StartScreen()
-        currentScreen.displayOutput(panel)
+        currentScreen.displayOutput(panelView)
     }
 
     override fun onCharClicked(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar) {
         currentScreen = currentScreen.respondToUserInput(x, y, char)
-        panel.clear()
-        currentScreen.displayOutput(panel)
+        currentScreen.displayOutput(panelView)
     }
 }

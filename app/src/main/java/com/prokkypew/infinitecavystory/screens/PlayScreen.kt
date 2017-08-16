@@ -7,7 +7,8 @@ import com.prokkypew.asciipanelview.AsciiPanelView
  */
 class PlayScreen : Screen {
     override fun displayOutput(panel: AsciiPanelView) {
-
+        panel.clear()
+        panel.writeCenter("Here is the game!", 10)
     }
 
     override fun respondToUserInput(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar): Screen {

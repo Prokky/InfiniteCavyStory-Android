@@ -9,6 +9,7 @@ import com.prokkypew.infinitecavystory.R
 class StartScreen : Screen {
     val bottomTextYPos = 20
     override fun displayOutput(panel: AsciiPanelView) {
+        panel.clear()
         panel.writeCenter(getString(R.string.start_screen_header), 10)
         panel.writeCenter(getString(R.string.start_screen_middle_text), 12)
         panel.writeCenter(getString(R.string.start_screen_bottom_text), bottomTextYPos)
