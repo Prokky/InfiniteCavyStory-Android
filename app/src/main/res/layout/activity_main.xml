@@ -6,11 +6,11 @@
     android:layout_height="match_parent"
     tools:context="com.prokkypew.infinitecavystory.MainActivity">
 
-    <com.prokkypew.infinitecavystory.AsciiPanelView
+    <com.prokkypew.asciipanelview.AsciiPanelView
         android:id="@+id/panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:defaultGlyphColor="#0000ff"
+        app:defaultGlyphColor="#ffffff"
         app:defaultBackgroundColor="#000000"/>
 
 </RelativeLayout>
