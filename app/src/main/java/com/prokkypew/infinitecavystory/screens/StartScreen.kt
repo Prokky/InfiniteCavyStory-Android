@@ -1,19 +1,23 @@
 package com.prokkypew.infinitecavystory.screens
 
-import android.view.MotionEvent
 import com.prokkypew.asciipanelview.AsciiPanelView
+import com.prokkypew.infinitecavystory.R
 
 /**
  * Created by prokk on 16.08.2017.
  */
 class StartScreen : Screen {
+    val bottomTextYPos = 20
     override fun displayOutput(panel: AsciiPanelView) {
-        panel.writeCenter("INFINITE CAVY STORY", 10)
-        panel.writeCenter("by Prokky", 12)
-        panel.writeCenter("-- click to start --", 20)
+        panel.writeCenter(getString(R.string.start_screen_header), 10)
+        panel.writeCenter(getString(R.string.start_screen_middle_text), 12)
+        panel.writeCenter(getString(R.string.start_screen_bottom_text), bottomTextYPos)
     }
 
-    override fun respondToUserInput(touch: MotionEvent): Screen {
-        return this
+    override fun respondToUserInput(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar): Screen {
+        if (y == bottomTextYPos && getString(R.string.start_screen_bottom_text).contains(char.glyph))
+            return PlayScreen()
+        else
+            return this
     }
 }

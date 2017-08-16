@@ -1,12 +1,16 @@
 package com.prokkypew.infinitecavystory.screens
 
-import android.view.MotionEvent
 import com.prokkypew.asciipanelview.AsciiPanelView
+import com.prokkypew.infinitecavystory.MainApplication
 
 /**
  * Created by prokk on 16.08.2017.
  */
 interface Screen {
     fun displayOutput(panel: AsciiPanelView)
-    fun respondToUserInput(touch: MotionEvent): Screen
+    fun respondToUserInput(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar): Screen
+}
+
+fun getString(stringId: Int): String{
+    return MainApplication.context.getString(stringId)
 }

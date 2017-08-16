@@ -2,15 +2,14 @@ package com.prokkypew.infinitecavystory
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.MotionEvent
-import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import com.prokkypew.asciipanelview.AsciiPanelView
 import com.prokkypew.infinitecavystory.screens.Screen
 import com.prokkypew.infinitecavystory.screens.StartScreen
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), View.OnTouchListener {
+class MainActivity : AppCompatActivity(), AsciiPanelView.OnCharClickedListener {
     lateinit var currentScreen: Screen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,15 +17,15 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_main)
 
-        panel.setOnTouchListener(this)
+        panel.onCharClickedListener = this
 
         currentScreen = StartScreen()
         currentScreen.displayOutput(panel)
     }
 
-    override fun onTouch(p0: View, p1: MotionEvent): Boolean {
+    override fun onCharClicked(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar) {
+        currentScreen = currentScreen.respondToUserInput(x, y, char)
+        panel.clear()
         currentScreen.displayOutput(panel)
-        currentScreen = currentScreen.respondToUserInput(p1)
-        return true
     }
 }
