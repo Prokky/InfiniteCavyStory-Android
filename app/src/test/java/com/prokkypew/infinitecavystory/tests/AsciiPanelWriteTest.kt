@@ -1,6 +1,9 @@
-package com.prokkypew.infinitecavystory
+package com.prokkypew.infinitecavystory.tests
 
 import android.graphics.Color
+import com.prokkypew.infinitecavystory.AsciiPanelView
+import com.prokkypew.infinitecavystory.checkCorrectString
+import com.prokkypew.infinitecavystory.checkInvalidCharPos
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -57,49 +60,46 @@ class AsciiPanelWriteTest {
         panel.setCursorPosition(1, 1)
         panel.writeChar('p', Color.RED)
         assertEquals(panel.chars[1][1].glyph, 'p')
-        assertEquals(panel.chars[1][1].color, Color.RED)
+        assertEquals(panel.chars[1][1].glyphColor, Color.RED)
 
-        panel.writeChar('a', 3, 3)
+        panel.writeCharWithPos('a', 3, 3)
         assertEquals(panel.chars[3][3].glyph, 'a')
 
         panel.writeChar('#', 4, 4, Color.BLUE)
         assertEquals(panel.chars[4][4].glyph, '#')
-        assertEquals(panel.chars[4][4].color, Color.BLUE)
+        assertEquals(panel.chars[4][4].glyphColor, Color.BLUE)
 
-        checkInvalidCharPos('c', 5, Integer.MAX_VALUE, null)
-        checkInvalidCharPos('c', Integer.MAX_VALUE, 5, null)
-        checkInvalidCharPos('c', 5, Integer.MAX_VALUE, Color.RED)
-        checkInvalidCharPos('c', Integer.MAX_VALUE, 5, Color.RED)
-    }
+        panel.setCursorPosition(15, 15)
+        panel.writeCharWithColor('z', Color.RED, Color.BLACK)
+        assertEquals(panel.chars[15][15].glyph, 'z')
+        assertEquals(panel.chars[15][15].glyphColor, Color.RED)
+        assertEquals(panel.chars[15][15].bgColor, Color.BLACK)
 
-    fun checkInvalidCharPos(glyph: Char, x: Int, y: Int, color: Int?) {
-        try {
-            if (color == null) {
-                panel.writeChar(glyph, x, y)
-            } else {
-                panel.writeChar(glyph, x, y, color)
-            }
-            Assert.fail()
-        } catch (e: IllegalArgumentException) {
-            assertNotNull(e)
-        }
+        checkInvalidCharPos(panel, 'c', 5, Integer.MAX_VALUE, null)
+        checkInvalidCharPos(panel, 'c', Integer.MAX_VALUE, 5, null)
+        checkInvalidCharPos(panel, 'c', 5, Integer.MAX_VALUE, Color.RED)
+        checkInvalidCharPos(panel, 'c', Integer.MAX_VALUE, 5, Color.RED)
     }
 
     @Test
     fun checkWriteString() {
-        var string = "pew"
+        val string = "pew"
         panel.writeString(string)
-        checkCorrectString(string, 0, 0, null)
+        checkCorrectString(panel, string, 0, 0, null, null)
 
         panel.setCursorPosX(0)
         panel.writeString(string, Color.BLUE)
-        checkCorrectString(string, 0, 0, Color.BLUE)
+        checkCorrectString(panel, string, 0, 0, Color.BLUE, null)
 
-        panel.writeString(string, 10, 1)
-        checkCorrectString(string, 10, 1, null)
+        panel.writeStringWithPos(string, 10, 1)
+        checkCorrectString(panel, string, 10, 1, null, null)
 
         panel.writeString(string, 0, 1, Color.RED)
-        checkCorrectString(string, 0, 1, Color.RED)
+        checkCorrectString(panel, string, 0, 1, Color.RED, null)
+
+        panel.setCursorPosition(15, 0)
+        panel.writeStringWithColor(string, Color.RED, Color.BLACK)
+        checkCorrectString(panel, string, 15, 0, Color.RED, Color.BLACK)
 
         panel.setCursorPosX(63)
         try {
@@ -107,14 +107,6 @@ class AsciiPanelWriteTest {
             Assert.fail()
         } catch (e: IllegalArgumentException) {
             assertNotNull(e)
-        }
-    }
-
-    fun checkCorrectString(string: String, posX: Int, posY: Int, color: Int?) {
-        for (i in posX..posX + string.length - 1) {
-            assertEquals(panel.chars[i][posY].glyph, string[i - posX])
-            if (color != null)
-                assertEquals(panel.chars[i][posY].color, color)
         }
     }
 }

@@ -1,10 +1,7 @@
 package com.prokkypew.infinitecavystory
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Typeface
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 
@@ -19,18 +16,22 @@ class AsciiPanelView : View {
         const val DEFAULT_PANEL_WIDTH: Int = 64
         const val DEFAULT_PANEL_HEIGHT: Int = 27
         const val DEFAULT_GLYPH_COLOR: Int = Color.BLACK
+        const val DEFAULT_bgColor_COLOR: Int = Color.WHITE
         const val DEFAULT_FONT: String = "font.ttf"
     }
 
     var panelWidth: Int = DEFAULT_PANEL_WIDTH
     var panelHeight: Int = DEFAULT_PANEL_HEIGHT
     var basicGlyphColor: Int = DEFAULT_GLYPH_COLOR
+    var basicBgColor: Int = DEFAULT_bgColor_COLOR
     lateinit var chars: Array<Array<ColoredChar>>
     var tileWidth: Float = 0f
     var tileHeight: Float = 0f
     var textPaint: Paint = Paint()
+    var textBgPaint: Paint = Paint()
     var cursorX: Int = 0
     var cursorY: Int = 0
+    var widthCompensation: Float = 0f
     var fontFamily: String = DEFAULT_FONT
 
     constructor(context: Context) : super(context) {
@@ -53,6 +54,7 @@ class AsciiPanelView : View {
             panelWidth = ta.getInt(R.styleable.AsciiPanelView_panelWidth, DEFAULT_PANEL_WIDTH)
             panelHeight = ta.getInt(R.styleable.AsciiPanelView_panelHeight, DEFAULT_PANEL_HEIGHT)
             basicGlyphColor = ta.getColor(R.styleable.AsciiPanelView_defaultGlyphColor, DEFAULT_GLYPH_COLOR)
+            basicBgColor = ta.getColor(R.styleable.AsciiPanelView_defaultBackgroundColor, DEFAULT_bgColor_COLOR)
             if (ta.hasValue(R.styleable.AsciiPanelView_fontFamily))
                 fontFamily = ta.getString(R.styleable.AsciiPanelView_fontFamily)
         } finally {
@@ -61,7 +63,7 @@ class AsciiPanelView : View {
     }
 
     fun init() {
-        chars = Array(panelWidth) { Array(panelHeight) { ColoredChar(' ', basicGlyphColor) } }
+        chars = Array(panelWidth) { Array(panelHeight) { ColoredChar(' ', basicGlyphColor, basicBgColor) } }
 
         val font = Typeface.create(Typeface.createFromAsset(context.assets, fontFamily), Typeface.BOLD)
         textPaint.typeface = font
@@ -70,18 +72,27 @@ class AsciiPanelView : View {
     override fun onSizeChanged(xNew: Int, yNew: Int, xOld: Int, yOld: Int) {
         super.onSizeChanged(xNew, yNew, xOld, yOld)
         tileWidth = xNew.toFloat() / panelWidth.toFloat()
-        textPaint.textSize = yNew.toFloat() / panelHeight.toFloat()
-        tileHeight = (yNew.toFloat() - textPaint.descent()) / panelHeight.toFloat()
+        tileHeight = (yNew.toFloat()) / panelHeight.toFloat()
         textPaint.textSize = tileHeight
+        val bounds = Rect()
+        textPaint.getTextBounds("W", 0, 1, bounds)
+        widthCompensation = (tileWidth - bounds.width()) / 2
     }
 
     override fun onDraw(canvas: Canvas) {
         for (w in 0..panelWidth - 1) {
-            val posX = 0 + tileWidth * w
+            val posX = tileWidth * w
             for (h in 0..panelHeight - 1) {
-                val posY = 0 + tileHeight * (h + 1)
-                textPaint.color = chars[w][h].color
-                canvas.drawText(chars[w][h].glyph.toString(), posX, posY, textPaint)
+                textBgPaint.color = chars[w][h].bgColor
+                canvas.drawRect(posX, tileHeight * h, posX + tileWidth, tileHeight * h + tileHeight, textBgPaint)
+            }
+        }
+        for (w in 0..panelWidth - 1) {
+            val posX = tileWidth * w
+            for (h in 0..panelHeight - 1) {
+                textPaint.color = chars[w][h].glyphColor
+                val posY = tileHeight * (h + 1) - textPaint.descent()
+                canvas.drawText(chars[w][h].glyph.toString(), posX + widthCompensation, posY, textPaint)
             }
         }
     }
@@ -103,97 +114,126 @@ class AsciiPanelView : View {
         setCursorPosY(y)
     }
 
-
-    fun writeChar(character: Char) {
-        writeChar(character, cursorX, cursorY, basicGlyphColor)
+    fun writeChar(character: Char): AsciiPanelView {
+        return writeChar(character, cursorX, cursorY, basicGlyphColor, basicBgColor)
     }
 
-    fun writeChar(character: Char, color: Int) {
-        writeChar(character, cursorX, cursorY, color)
+    fun writeChar(character: Char, glyphColor: Int): AsciiPanelView {
+        return writeChar(character, cursorX, cursorY, glyphColor, basicBgColor)
     }
 
-    fun writeChar(character: Char, x: Int, y: Int) {
+    fun writeCharWithColor(character: Char, glyphColor: Int, bgColor: Int): AsciiPanelView {
+        return writeChar(character, cursorX, cursorY, glyphColor, bgColor)
+    }
+
+    fun writeCharWithPos(character: Char, x: Int, y: Int): AsciiPanelView {
         if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be in range [0,$panelWidth)")
         if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight)")
 
-        writeChar(character, x, y, basicGlyphColor)
+        return writeChar(character, x, y, basicGlyphColor, basicBgColor)
     }
 
-    fun writeChar(character: Char, x: Int, y: Int, color: Int?) {
+    fun writeChar(character: Char, x: Int, y: Int, glyphColor: Int): AsciiPanelView {
         if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be in range [0,$panelWidth)")
         if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight)")
 
-        var glyphColor = color
+        return writeChar(character, x, y, glyphColor, basicBgColor)
+    }
 
-        if (glyphColor == null) glyphColor = basicGlyphColor
+    fun writeChar(character: Char, x: Int, y: Int, glyphColor: Int?, bgColor: Int?): AsciiPanelView {
+        if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be in range [0,$panelWidth)")
+        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight)")
 
-        chars[x][y] = ColoredChar(character, glyphColor)
+        var gColor = glyphColor
+        var bColor = bgColor
+
+        if (gColor == null) gColor = basicGlyphColor
+        if (bColor == null) bColor = basicBgColor
+
+        chars[x][y] = ColoredChar(character, gColor, bColor)
         cursorX = x + 1
         cursorY = y
+        return this
     }
 
-    fun writeString(string: String) {
+    fun writeString(string: String): AsciiPanelView {
         if (cursorX + string.length > panelWidth) throw IllegalArgumentException("cursorX + string.length() " + (cursorX + string.length) + " must be less than " + panelWidth + ".")
 
-        writeString(string, cursorX, cursorY, basicGlyphColor)
+        return writeString(string, cursorX, cursorY, basicGlyphColor, basicBgColor)
     }
 
-    fun writeString(string: String, color: Int) {
+    fun writeString(string: String, glyphColor: Int): AsciiPanelView {
         if (cursorX + string.length > panelWidth) throw IllegalArgumentException("cursorX + string.length() " + (cursorX + string.length) + " must be less than " + panelWidth + ".")
 
-        writeString(string, cursorX, cursorY, color)
+        return writeString(string, cursorX, cursorY, glyphColor, basicBgColor)
     }
 
-    fun writeString(string: String, x: Int, y: Int) {
+    fun writeStringWithColor(string: String, glyphColor: Int, bgColor: Int): AsciiPanelView {
+        if (cursorX + string.length > panelWidth) throw IllegalArgumentException("cursorX + string.length() " + (cursorX + string.length) + " must be less than " + panelWidth + ".")
+
+        return writeString(string, cursorX, cursorY, glyphColor, bgColor)
+    }
+
+    fun writeStringWithPos(string: String, x: Int, y: Int): AsciiPanelView {
         if (x + string.length > panelWidth) throw IllegalArgumentException("x + string.length() " + (x + string.length) + " must be less than " + panelWidth + ".")
         if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be in range [0,$panelWidth)")
         if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight)")
 
-        writeString(string, x, y, basicGlyphColor)
+        return writeString(string, x, y, basicGlyphColor, basicBgColor)
     }
 
-    fun writeString(string: String, x: Int, y: Int, color: Int?) {
+    fun writeString(string: String, x: Int, y: Int, glyphColor: Int): AsciiPanelView {
+        if (x + string.length > panelWidth) throw IllegalArgumentException("x + string.length() " + (x + string.length) + " must be less than " + panelWidth + ".")
+        if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be in range [0,$panelWidth)")
+        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight)")
+
+        return writeString(string, x, y, glyphColor, basicBgColor)
+    }
+
+    fun writeString(string: String, x: Int, y: Int, glyphColor: Int?, bgColor: Int?): AsciiPanelView {
         if (x + string.length > panelWidth) throw IllegalArgumentException("x + string.length() " + (x + string.length) + " must be less than " + panelWidth + ".")
         if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be in range [0,$panelWidth).")
         if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight).")
 
-        var glyphColor = color
+        var gColor = glyphColor
+        var bColor = bgColor
 
-        if (glyphColor == null)
-            glyphColor = basicGlyphColor
+        if (gColor == null) gColor = basicGlyphColor
 
+        if (bColor == null) bColor = basicBgColor
 
         for (i in 0..string.length - 1) {
-            writeChar(string[i], x + i, y, glyphColor)
+            writeChar(string[i], x + i, y, gColor, bColor)
         }
+        return this
     }
 
-    fun clear() {
-        clearRect(' ', 0, 0, panelWidth, panelHeight, basicGlyphColor)
+    fun clear(): AsciiPanelView {
+        return clearRect(' ', 0, 0, panelWidth, panelHeight, basicGlyphColor, basicBgColor)
     }
 
-    fun clear(character: Char) {
-        clearRect(character, 0, 0, panelWidth, panelHeight, basicGlyphColor)
+    fun clear(character: Char): AsciiPanelView {
+        return clearRect(character, 0, 0, panelWidth, panelHeight, basicGlyphColor, basicBgColor)
     }
 
-    fun clear(character: Char, color: Int) {
-        clearRect(character, 0, 0, panelWidth, panelHeight, color)
+    fun clear(character: Char, glyphColor: Int, bgColor: Int): AsciiPanelView {
+        return clearRect(character, 0, 0, panelWidth, panelHeight, glyphColor, bgColor)
     }
 
-    fun clearRect(character: Char, x: Int, y: Int, width: Int, height: Int) {
-        if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be within range [0,$panelWidth).")
-        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be within range [0,$panelHeight).")
+    fun clearRect(character: Char, x: Int, y: Int, width: Int, height: Int): AsciiPanelView {
+        if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be in range [0,$panelWidth).")
+        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight).")
         if (width < 1) throw IllegalArgumentException("width $width must be greater than 0.")
         if (height < 1) throw IllegalArgumentException("height $height must be greater than 0.")
         if (x + width > panelWidth) throw IllegalArgumentException("x + width " + (x + width) + " must be less than " + (panelWidth + 1) + ".")
         if (y + height > panelHeight) throw IllegalArgumentException("y + height " + (y + height) + " must be less than " + (panelHeight + 1) + ".")
 
-        clearRect(character, x, y, width, height, basicGlyphColor)
+        return clearRect(character, x, y, width, height, basicGlyphColor, basicBgColor)
     }
 
-    fun clearRect(character: Char, x: Int, y: Int, width: Int, height: Int, color: Int) {
-        if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be within range [0,$panelWidth)")
-        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be within range [0,$panelHeight)")
+    fun clearRect(character: Char, x: Int, y: Int, width: Int, height: Int, glyphColor: Int, bgColor: Int): AsciiPanelView {
+        if (x < 0 || x >= panelWidth) throw IllegalArgumentException("x $x must be in range [0,$panelWidth)")
+        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight)")
         if (width < 1) throw IllegalArgumentException("width $width must be greater than 0.")
         if (height < 1) throw IllegalArgumentException("height $height must be greater than 0.")
         if (x + width > panelWidth) throw IllegalArgumentException("x + width " + (x + width) + " must be less than " + (panelWidth + 1) + ".")
@@ -203,13 +243,51 @@ class AsciiPanelView : View {
         val originalCursorY = cursorY
         for (xo in x..x + width - 1) {
             for (yo in y..y + height - 1) {
-                writeChar(character, xo, yo, color)
+                writeChar(character, xo, yo, glyphColor, bgColor)
             }
         }
         cursorX = originalCursorX
         cursorY = originalCursorY
+
+        return this
     }
 
+    fun writeCenter(string: String, y: Int): AsciiPanelView {
+        if (string.length > panelWidth) throw IllegalArgumentException("string.length() " + string.length + " must be less than " + panelWidth + ".")
+        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight)")
 
-    class ColoredChar(var glyph: Char, var color: Int)
+        val x = (panelWidth - string.length) / 2
+
+        return writeString(string, x, y, basicGlyphColor, basicBgColor)
+    }
+
+    fun writeCenter(string: String, y: Int, glyphColor: Int): AsciiPanelView {
+        if (string.length > panelWidth) throw IllegalArgumentException("string.length() " + string.length + " must be less than " + panelWidth + ".")
+        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight)")
+
+        val x = (panelWidth - string.length) / 2
+
+        return writeString(string, x, y, glyphColor, basicBgColor)
+    }
+
+    fun writeCenter(string: String, y: Int, glyphColor: Int?, bgColor: Int?): AsciiPanelView {
+        if (string.length > panelWidth) throw IllegalArgumentException("string.length() " + string.length + " must be less than " + panelWidth + ".")
+        if (y < 0 || y >= panelHeight) throw IllegalArgumentException("y $y must be in range [0,$panelHeight).")
+
+        var gColor = glyphColor
+        var bColor = bgColor
+
+        val x = (panelWidth - string.length) / 2
+
+        if (gColor == null) gColor = basicGlyphColor
+
+        if (bColor == null) bColor = basicBgColor
+
+        for (i in 0..string.length - 1) {
+            writeChar(string[i], x + i, y, gColor, bColor)
+        }
+        return this
+    }
+
+    class ColoredChar(var glyph: Char, var glyphColor: Int, var bgColor: Int)
 }

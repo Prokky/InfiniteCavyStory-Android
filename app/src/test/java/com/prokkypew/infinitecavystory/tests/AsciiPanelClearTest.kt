@@ -1,6 +1,8 @@
-package com.prokkypew.infinitecavystory
+package com.prokkypew.infinitecavystory.tests
 
 import android.graphics.Color
+import com.prokkypew.infinitecavystory.AsciiPanelView
+import com.prokkypew.infinitecavystory.checkRectangleCleared
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -31,13 +33,13 @@ class AsciiPanelClearTest {
     @Test
     fun checkBasicClear() {
         panel.setCursorPosition(15, 20)
-        panel.writeChar('c', 15, 20)
+        panel.writeCharWithPos('c', 15, 20)
         assertEquals(panel.chars[15][20].glyph, 'c')
         panel.clear()
         assertEquals(panel.chars[15][20].glyph, ' ')
 
         panel.setCursorPosition(15, 20)
-        panel.writeChar('c', 15, 20)
+        panel.writeCharWithPos('c', 15, 20)
         assertEquals(panel.chars[15][20].glyph, 'c')
         panel.clear('d')
         assertEquals(panel.chars[15][20].glyph, 'd')
@@ -45,26 +47,17 @@ class AsciiPanelClearTest {
         panel.setCursorPosition(15, 20)
         panel.writeChar('c', 15, 20, Color.RED)
         assertEquals(panel.chars[15][20].glyph, 'c')
-        panel.clear('d', Color.BLUE)
+        panel.clear('d', Color.BLUE, Color.WHITE)
         assertEquals(panel.chars[15][20].glyph, 'd')
-        assertEquals(panel.chars[15][20].color, Color.BLUE)
+        assertEquals(panel.chars[15][20].glyphColor, Color.BLUE)
+        assertEquals(panel.chars[15][20].bgColor, Color.WHITE)
 
         panel.clear()
         panel.clearRect('b', 5, 5, 10, 10)
-        checkRectangleCleared('b', 5, 5, 10, 10, null)
+        checkRectangleCleared(panel, 'b', 5, 5, 10, 10, null, null)
 
         panel.clear()
-        panel.clearRect('w', 10, 10, 5, 5, Color.RED)
-        checkRectangleCleared('w', 10, 10, 5, 5, Color.RED)
-    }
-
-    fun checkRectangleCleared(character: Char, x: Int, y: Int, width: Int, height: Int, color: Int?) {
-        for (i in x..x + width - 1) {
-            for (j in y..y + height - 1) {
-                assertEquals(panel.chars[i][j].glyph, character)
-                if (color != null)
-                    assertEquals(panel.chars[i][j].color, color)
-            }
-        }
+        panel.clearRect('w', 10, 10, 5, 5, Color.RED, Color.WHITE)
+        checkRectangleCleared(panel, 'w', 10, 10, 5, 5, Color.RED, Color.WHITE)
     }
 }
