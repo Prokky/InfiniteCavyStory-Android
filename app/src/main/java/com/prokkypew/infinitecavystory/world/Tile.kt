@@ -7,7 +7,7 @@ import android.graphics.Color
  */
 enum class Tile constructor(private val glyph: Char, private val color: Int, private val description: String) {
     FLOOR('·', Color.parseColor("#CD853F"), "A dirt and rock cave floor."),
-    WALL('▒', Color.parseColor("#CD853F"), "A dirt and rock cave wall."),
+    WALL('#', Color.parseColor("#CD853F"), "A dirt and rock cave wall."),
     BOUNDS('x', Color.BLACK, "Beyond the edge of the world."),
     STAIRS_DOWN('>', Color.WHITE, "A stone staircase that goes down."),
     STAIRS_UP('<', Color.WHITE, "A stone staircase that goes up."),

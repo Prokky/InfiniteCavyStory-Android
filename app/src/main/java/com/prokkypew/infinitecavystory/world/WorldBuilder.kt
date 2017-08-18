@@ -1,5 +1,6 @@
 package com.prokkypew.infinitecavystory.world
 
+import io.reactivex.Flowable
 import java.util.*
 
 
@@ -174,8 +175,10 @@ class WorldBuilder(private val width: Int, private val height: Int, private val 
         return this
     }
 
-    fun makeCaves(): WorldBuilder {
-        return randomizeTiles().smooth(8).createRegions().connectRegions()
-                .addExitStairs()
+    fun makeCaves(): Flowable<WorldBuilder> {
+        return Flowable.fromCallable<WorldBuilder> {
+            randomizeTiles().smooth(8).createRegions().connectRegions()
+                    .addExitStairs()
+        }
     }
 }

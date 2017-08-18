@@ -3,19 +3,31 @@ package com.prokkypew.infinitecavystory.screens
 import com.prokkypew.asciipanelview.AsciiPanelView
 import com.prokkypew.infinitecavystory.StuffFactory
 import com.prokkypew.infinitecavystory.creatures.Creature
+import com.prokkypew.infinitecavystory.world.World
 import com.prokkypew.infinitecavystory.world.WorldBuilder
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 
 /**
  * Created by prokk on 16.08.2017.
  */
 class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
-    private var world = WorldBuilder(150, 100, 10).makeCaves().build()
+    private lateinit var world: World
     private lateinit var player: Creature
+    private var worldGenerated = false
 
     init {
-        val factory = StuffFactory(world)
-        createCreatures(factory)
+        WorldBuilder(150, 100, 10).makeCaves()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ t: WorldBuilder ->
+                    world = t.build()
+                    worldGenerated = true
+                    val factory = StuffFactory(world)
+                    createCreatures(factory)
+                    displayOutput()
+                }, Throwable::printStackTrace)
     }
 
     private fun createCreatures(factory: StuffFactory) {
@@ -24,7 +36,11 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
 
     override fun displayOutput() {
         panel.clear()
-        displayTiles()
+        if (worldGenerated) {
+            displayTiles()
+        } else {
+            panel.writeCenter("Generating world", 10)
+        }
     }
 
     private fun displayTiles() {
@@ -47,6 +63,9 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     }
 
     override fun respondToUserInput(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar): Screen {
+        if (!worldGenerated)
+            return this
+
         var xMove = 0
         var yMove = 0
 
