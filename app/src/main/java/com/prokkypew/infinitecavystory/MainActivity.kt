@@ -10,7 +10,7 @@ import com.prokkypew.infinitecavystory.screens.StartScreen
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), AsciiPanelView.OnCharClickedListener {
-    lateinit var currentScreen: Screen
+    private lateinit var currentScreen: Screen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -19,12 +19,12 @@ class MainActivity : AppCompatActivity(), AsciiPanelView.OnCharClickedListener {
 
         panelView.onCharClickedListener = this
 
-        currentScreen = StartScreen()
-        currentScreen.displayOutput(panelView)
+        currentScreen = StartScreen(panelView)
+        currentScreen.displayOutput()
     }
 
     override fun onCharClicked(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar) {
         currentScreen = currentScreen.respondToUserInput(x, y, char)
-        currentScreen.displayOutput(panelView)
+        currentScreen.displayOutput()
     }
 }

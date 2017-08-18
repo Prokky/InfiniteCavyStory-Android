@@ -6,19 +6,22 @@ import com.prokkypew.infinitecavystory.R
 /**
  * Created by prokk on 16.08.2017.
  */
-class StartScreen : Screen {
-    val bottomTextYPos = 20
-    override fun displayOutput(panel: AsciiPanelView) {
+class StartScreen(panelView: AsciiPanelView) : Screen(panelView) {
+    companion object {
+        private val BOTTOM_TEXT_Y_POS = 20
+    }
+
+    override fun displayOutput() {
         panel.clear()
         panel.writeCenter(getString(R.string.start_screen_header), 10)
         panel.writeCenter(getString(R.string.start_screen_middle_text), 12)
-        panel.writeCenter(getString(R.string.start_screen_bottom_text), bottomTextYPos)
+        panel.writeCenter(getString(R.string.start_screen_bottom_text), BOTTOM_TEXT_Y_POS)
     }
 
     override fun respondToUserInput(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar): Screen {
-        if (y == bottomTextYPos && getString(R.string.start_screen_bottom_text).contains(char.glyph))
-            return PlayScreen()
+        return if (y == BOTTOM_TEXT_Y_POS && getString(R.string.start_screen_bottom_text).contains(char.glyph))
+            PlayScreen(panel)
         else
-            return this
+            this
     }
 }
