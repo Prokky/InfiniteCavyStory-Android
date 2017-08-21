@@ -13,7 +13,7 @@ class WorldBuilder(private val width: Int, private val height: Int, private val 
     private var nextRegion = 1
 
 
-    fun build(): World {
+    private fun build(): World {
         return World(tiles)
     }
 
@@ -175,10 +175,10 @@ class WorldBuilder(private val width: Int, private val height: Int, private val 
         return this
     }
 
-    fun makeCaves(): Flowable<WorldBuilder> {
-        return Flowable.fromCallable<WorldBuilder> {
+    fun makeCaves(): Flowable<World> {
+        return Flowable.fromCallable<World> {
             randomizeTiles().smooth(8).createRegions().connectRegions()
-                    .addExitStairs()
+                    .addExitStairs().build()
         }
     }
 }

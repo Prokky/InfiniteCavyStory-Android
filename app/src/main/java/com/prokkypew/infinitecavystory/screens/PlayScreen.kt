@@ -1,8 +1,10 @@
 package com.prokkypew.infinitecavystory.screens
 
+import android.graphics.Color
 import com.prokkypew.asciipanelview.AsciiPanelView
 import com.prokkypew.infinitecavystory.StuffFactory
 import com.prokkypew.infinitecavystory.creatures.Creature
+import com.prokkypew.infinitecavystory.world.FieldOfView
 import com.prokkypew.infinitecavystory.world.World
 import com.prokkypew.infinitecavystory.world.WorldBuilder
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -15,15 +17,17 @@ import io.reactivex.schedulers.Schedulers
 class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     private lateinit var world: World
     private lateinit var player: Creature
+    private lateinit var fov: FieldOfView
     private var worldGenerated = false
 
     init {
         WorldBuilder(150, 100, 10).makeCaves()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ t: WorldBuilder ->
-                    world = t.build()
+                .subscribe({ w: World ->
+                    world = w
                     worldGenerated = true
+                    fov = FieldOfView(world)
                     val factory = StuffFactory(world)
                     createCreatures(factory)
                     displayOutput()
@@ -31,7 +35,7 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     }
 
     private fun createCreatures(factory: StuffFactory) {
-        player = factory.newPlayer()
+        player = factory.newPlayer(fov)
     }
 
     override fun displayOutput() {
@@ -44,12 +48,17 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     }
 
     private fun displayTiles() {
+        fov.update(player.x, player.y, player.z, player.visionRadius)
+
         for (x in 0 until panel.panelWidth) {
             for (y in 0 until panel.panelHeight) {
                 val wx = x + getScrollX()
                 val wy = y + getScrollY()
 
-                panel.writeChar(world.glyph(wx, wy, player.z), x, y, world.color(wx, wy, player.z))
+                if (player.canSee(wx, wy, player.z))
+                    panel.writeChar(world.glyph(wx, wy, player.z), x, y, world.color(wx, wy, player.z))
+                else
+                    panel.writeChar(fov.tile(wx, wy, player.z).glyph(), x, y, Color.DKGRAY)
             }
         }
     }

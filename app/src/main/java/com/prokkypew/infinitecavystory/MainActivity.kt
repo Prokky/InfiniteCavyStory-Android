@@ -19,8 +19,10 @@ class MainActivity : AppCompatActivity(), AsciiPanelView.OnCharClickedListener {
 
         panelView.onCharClickedListener = this
 
-        currentScreen = StartScreen(panelView)
-        currentScreen.displayOutput()
+        if (savedInstanceState == null) {
+            currentScreen = StartScreen(panelView)
+            currentScreen.displayOutput()
+        }
     }
 
     override fun onCharClicked(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar) {
