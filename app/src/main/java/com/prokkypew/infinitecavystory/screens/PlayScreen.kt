@@ -24,14 +24,16 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
         WorldBuilder(150, 100, 10).makeCaves()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ w: World ->
-                    world = w
-                    worldGenerated = true
-                    fov = FieldOfView(world)
-                    val factory = StuffFactory(world)
-                    createCreatures(factory)
-                    displayOutput()
-                }, Throwable::printStackTrace)
+                .subscribe(this::initWithWorld, Throwable::printStackTrace)
+    }
+
+    private fun initWithWorld(w: World) {
+        world = w
+        worldGenerated = true
+        fov = FieldOfView(world)
+        val factory = StuffFactory(world)
+        createCreatures(factory)
+        displayOutput()
     }
 
     private fun createCreatures(factory: StuffFactory) {
