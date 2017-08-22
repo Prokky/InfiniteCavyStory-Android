@@ -19,7 +19,7 @@ class StartScreen(panelView: AsciiPanelView) : Screen(panelView) {
     }
 
     override fun respondToUserInput(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar): Screen {
-        return if (y == BOTTOM_TEXT_Y_POS && getString(R.string.start_screen_bottom_text).contains(char.glyph))
+        return if (y == BOTTOM_TEXT_Y_POS && getString(R.string.start_screen_bottom_text).contains(char.char))
             PlayScreen(panel)
         else
             this
