@@ -4,6 +4,8 @@ import android.graphics.Color
 import com.prokkypew.asciipanelview.AsciiPanelView
 import com.prokkypew.infinitecavystory.StuffFactory
 import com.prokkypew.infinitecavystory.creatures.Creature
+import com.prokkypew.infinitecavystory.drawControls
+import com.prokkypew.infinitecavystory.handleControl
 import com.prokkypew.infinitecavystory.world.FieldOfView
 import com.prokkypew.infinitecavystory.world.World
 import com.prokkypew.infinitecavystory.world.WorldBuilder
@@ -44,6 +46,7 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
         panel.clear()
         if (worldGenerated) {
             displayTiles()
+            drawControls(panel, panel.panelWidth, panel.panelHeight)
         } else {
             panel.writeCenter("Generating world", 10)
         }
@@ -77,23 +80,9 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
         if (!worldGenerated)
             return this
 
-        var xMove = 0
-        var yMove = 0
-
-        if (x?.coerceIn(0, 4) == x)
-            xMove = -1
-        else if (x?.coerceIn(panel.panelWidth - 3, panel.panelWidth) == x)
-            xMove = 1
-
-        if (y?.coerceIn(0, 4) == y)
-            yMove = -1
-        else if (y?.coerceIn(panel.panelHeight - 3, panel.panelHeight) == y)
-            yMove = 1
-
-        player.moveBy(xMove, yMove, 0)
+        handleControl(char.char, player)
 
         displayOutput()
-
         return this
     }
 }

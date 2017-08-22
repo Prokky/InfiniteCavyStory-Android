@@ -10,7 +10,10 @@
         android:id="@+id/panelView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:defaultBackgroundColor="#000000"
         app:defaultCharColor="#ffffff"
-        app:defaultBackgroundColor="#000000"/>
+        app:panelHeight="44"
+        app:fontFamily="DejaVuSansMono.ttf"
+        app:panelWidth="80" />
 
 </RelativeLayout>
