@@ -27,7 +27,18 @@ class World(private val tiles: Array<Array<Array<Tile>>>) {
         creatures.add(creature)
     }
 
-    private fun creature(x: Int, y: Int, z: Int): Creature? {
+    fun update() {
+        val toUpdate = ArrayList(creatures)
+        for (creature in toUpdate) {
+            creature.update()
+        }
+    }
+
+    fun remove(other: Creature) {
+        creatures.remove(other)
+    }
+
+    fun creature(x: Int, y: Int, z: Int): Creature? {
         return creatures.firstOrNull { it.x == x && it.y == y && it.z == z }
     }
 

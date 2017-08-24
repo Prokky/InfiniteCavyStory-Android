@@ -23,4 +23,6 @@ class PlayerAi(creature: Creature, private val messages: ArrayList<String>, priv
             messages.removeAt(0)
         }
     }
+
+    override fun onGainLevel() {}
 }

@@ -8,7 +8,7 @@ import com.prokkypew.infinitecavystory.world.Tile
 /**
  * Created by alexander.roman on 17.08.2017.
  */
-open class CreatureAi(private var creature: Creature) {
+open class CreatureAi(protected var creature: Creature) {
     open fun onEnter(x: Int, y: Int, z: Int, tile: Tile) {
         if (tile.isGround) {
             creature.x = x
@@ -32,4 +32,22 @@ open class CreatureAi(private var creature: Creature) {
     }
 
     open fun onNotify(message: String) {}
+
+    open fun onUpdate() {}
+
+    fun wander() {
+        val mx = (Math.random() * 3).toInt() - 1
+        val my = (Math.random() * 3).toInt() - 1
+
+        val other = creature.creature(creature.x + mx, creature.y + my, creature.z)
+
+        if (other != null && other.name == creature.name || !creature.tile(creature.x + mx, creature.y + my, creature.z).isGround)
+            return
+        else
+            creature.moveBy(mx, my, 0)
+    }
+
+    open fun onGainLevel() {
+        //TODO LEVEL UP CREATURES
+    }
 }

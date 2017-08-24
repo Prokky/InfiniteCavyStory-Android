@@ -2,8 +2,8 @@ package com.prokkypew.infinitecavystory.screens
 
 import android.graphics.Color
 import com.prokkypew.asciipanelview.AsciiPanelView
-import com.prokkypew.infinitecavystory.Gui
 import com.prokkypew.infinitecavystory.CreatureFactory
+import com.prokkypew.infinitecavystory.Gui
 import com.prokkypew.infinitecavystory.creatures.Creature
 import com.prokkypew.infinitecavystory.drawControls
 import com.prokkypew.infinitecavystory.handleControl
@@ -50,7 +50,14 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     }
 
     private fun createCreatures() {
-
+        for (z in 0 until world.depth) {
+            for (i in 0..3) {
+                creatureFactory.newFungus(z)
+            }
+            for (i in 0..9) {
+                creatureFactory.newBat(z)
+            }
+        }
     }
 
     override fun displayOutput() {
@@ -67,7 +74,7 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
 
     private fun displayTiles() {
         fov.update(player.x, player.y, player.z, player.visionRadius)
-
+        world.update()
         for (x in 0 until PLAY_WIDTH) {
             for (y in 0 until PLAY_HEIGHT) {
                 val wx = x + getScrollX()

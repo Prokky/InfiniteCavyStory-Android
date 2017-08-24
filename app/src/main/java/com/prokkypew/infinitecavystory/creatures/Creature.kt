@@ -19,14 +19,101 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
     var hp = maxHp
     var maxFood: Int = 1000
     var food: Int = maxFood / 3 * 2
+    var xp: Int = 0
+    var level: Int = 1
+    var causeOfDeath: String = ""
 
     fun moveBy(mx: Int, my: Int, mz: Int) {
         if (mx == 0 && my == 0 && mz == 0)
             return
 
         val tile = world.tile(x + mx, y + my, z + mz)
-        ai?.onEnter(x + mx, y + my, z + mz, tile)
+
+        if (mz == -1) {
+            if (tile === Tile.STAIRS_DOWN) {
+                doAction("walk up the stairs to level %d", z + mz + 1)
+            } else {
+                doAction("try to go up but are stopped by the cave ceiling")
+                return
+            }
+        } else if (mz == 1) {
+            if (tile === Tile.STAIRS_UP) {
+                doAction("walk down the stairs to level %d", z + mz + 1)
+            } else {
+                doAction("try to go down but are stopped by the cave floor")
+                return
+            }
+        }
+
+        val other = world.creature(x + mx, y + my, z + mz)
+
+        if (other == null)
+            ai?.onEnter(x + mx, y + my, z + mz, tile)
+        else
+            meleeAttack(other)
     }
+
+    private fun meleeAttack(other: Creature) {
+        commonAttack(other, attackValue(), "attack the %s for %d damage", other.name)
+    }
+
+    private fun commonAttack(other: Creature, attack: Int, action: String, vararg params: Any) {
+        var amount = Math.max(0, attack - other.defenseValue())
+
+        amount = (Math.random() * amount).toInt() + 1
+
+        doAction(action, *params, amount)
+
+        other.modifyHp(-amount, "Killed by a " + name)
+
+        if (other.hp < 1)
+            gainXp(other)
+    }
+
+    private fun modifyXp(amount: Int) {
+        xp += amount
+
+        notify("You %s %d xp.", if (amount < 0) "lose" else "gain", amount)
+
+        while (xp > (Math.pow(level.toDouble(), 1.75) * 25).toInt()) {
+            level++
+            doAction("advance to level %d", level)
+            ai?.onGainLevel()
+            modifyHp(level * 2, "Died from having a negative level?")
+        }
+    }
+
+    private fun modifyHp(amount: Int, causeOfDeath: String) {
+        hp += amount
+        this.causeOfDeath = causeOfDeath
+
+        if (hp > maxHp) {
+            hp = maxHp
+        } else if (hp < 1) {
+            doAction("die")
+            world.remove(this)
+        }
+    }
+
+    private fun gainXp(other: Creature) {
+        val amount = other.maxHp + other.attackValue() + other.defenseValue() - level
+
+        if (amount > 0)
+            modifyXp(amount)
+    }
+
+    private var attackValue: Int = 0
+
+    private fun attackValue(): Int {
+        return attackValue
+    }
+
+    private var defenseValue: Int = 0
+
+    private fun defenseValue(): Int {
+        return defenseValue
+    }
+
 
     fun canSee(wx: Int, wy: Int, wz: Int): Boolean {
         if (ai == null)
@@ -39,7 +126,7 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
         return world.tile(wx, wy, wz)
     }
 
-    fun notify(message: String, vararg params: Any) {
+    private fun notify(message: String, vararg params: Any) {
         ai?.onNotify(String.format(message, *params))
     }
 
@@ -51,5 +138,62 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
             food > maxFood * 0.75 -> "Full"
             else -> "Fine"
         }
+    }
+
+    fun canEnter(wx: Int, wy: Int, wz: Int): Boolean {
+        return world.tile(wx, wy, wz).isGround && world.creature(wx, wy, wz) == null
+    }
+
+    fun doAction(message: String, vararg params: Any) {
+        for (other in getCreaturesWhoSeeMe()) {
+            if (other === this) {
+                other.notify("You $message.", *params)
+            } else {
+                other.notify(String.format("The %s %s.", name,
+                        makeSecondPerson(message)), *params)
+            }
+        }
+    }
+
+    fun update() {
+        ai?.onUpdate()
+    }
+
+    fun tile(wx: Int, wy: Int, wz: Int): Tile {
+        return if (canSee(wx, wy, wz))
+            world.tile(wx, wy, wz)
+        else
+            ai!!.rememberedTile(wx, wy, wz)
+    }
+
+    fun creature(wx: Int, wy: Int, wz: Int): Creature? {
+        return if (canSee(wx, wy, wz))
+            world.creature(wx, wy, wz)
+        else
+            null
+    }
+
+    private fun getCreaturesWhoSeeMe(): List<Creature> {
+        val others = ArrayList<Creature>()
+        val r = 9
+        for (ox in -r until r + 1) {
+            (-r until r + 1)
+                    .filter { ox * ox + it * it <= r * r }
+                    .mapNotNullTo(others) { world.creature(x + ox, y + it, z) }
+        }
+        return others
+    }
+
+    private fun makeSecondPerson(text: String): String {
+        val words = text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        words[0] = words[0] + "s"
+
+        val builder = StringBuilder()
+        for (word in words) {
+            builder.append(" ")
+            builder.append(word)
+        }
+
+        return builder.toString().trim { it <= ' ' }
     }
 }

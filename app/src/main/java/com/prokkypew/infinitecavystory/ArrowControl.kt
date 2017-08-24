@@ -42,6 +42,5 @@ fun handleControl(char: Char, player: Creature) {
         yMove = 1
 
     player.moveBy(xMove, yMove, 0)
-    player.notify("Moved $xMove $yMove")
 }
 
