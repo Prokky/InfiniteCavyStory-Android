@@ -30,4 +30,6 @@ open class CreatureAi(private var creature: Creature) {
     open fun rememberedTile(wx: Int, wy: Int, wz: Int): Tile {
         return Tile.UNKNOWN
     }
+
+    open fun onNotify(message: String) {}
 }

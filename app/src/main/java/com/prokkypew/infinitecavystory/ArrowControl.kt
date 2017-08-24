@@ -21,8 +21,8 @@ private enum class ArrowControl constructor(val glyph: Char, val color: Int, val
 
 fun drawControls(panel: AsciiPanelView, width: Int, height: Int) {
     for (control in ArrowControl.values()) {
-        var posX = (width * control.xOffset - 4 * control.xOffset).toInt()
-        var posY = (height * control.yOffset - 4 * control.yOffset).toInt()
+        val posX = (width * control.xOffset - 4 * control.xOffset).toInt()
+        val posY = (height * control.yOffset - 4 * control.yOffset).toInt()
         panel.clearRect(control.glyph, posX, posY, 4, 4, control.color, control.bgColor)
     }
 }
@@ -42,5 +42,6 @@ fun handleControl(char: Char, player: Creature) {
         yMove = 1
 
     player.moveBy(xMove, yMove, 0)
+    player.notify("Moved $xMove $yMove")
 }
 

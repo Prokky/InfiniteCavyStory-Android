@@ -10,10 +10,10 @@ import com.prokkypew.infinitecavystory.world.World
 /**
  * Created by alexander.roman on 17.08.2017.
  */
-class StuffFactory(private val world: World) {
-    fun newPlayer(fov: FieldOfView): Creature {
-        val player = Creature(world, '@', Color.WHITE)
-        player.ai = PlayerAi(player, fov)
+class CreatureFactory(private val world: World) {
+    fun newPlayer(messages: ArrayList<String>, fov: FieldOfView): Creature {
+        val player = Creature(world, '@', Color.WHITE, "player", 100, 20)
+        player.ai = PlayerAi(player, messages, fov)
         world.addAtEmptyLocation(player, 0)
         return player
     }

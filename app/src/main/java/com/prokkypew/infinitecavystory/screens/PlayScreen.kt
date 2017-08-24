@@ -2,7 +2,8 @@ package com.prokkypew.infinitecavystory.screens
 
 import android.graphics.Color
 import com.prokkypew.asciipanelview.AsciiPanelView
-import com.prokkypew.infinitecavystory.StuffFactory
+import com.prokkypew.infinitecavystory.Gui
+import com.prokkypew.infinitecavystory.CreatureFactory
 import com.prokkypew.infinitecavystory.creatures.Creature
 import com.prokkypew.infinitecavystory.drawControls
 import com.prokkypew.infinitecavystory.handleControl
@@ -17,10 +18,18 @@ import io.reactivex.schedulers.Schedulers
  * Created by prokk on 16.08.2017.
  */
 class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
+    companion object {
+        val PLAY_WIDTH = 62
+        val PLAY_HEIGHT = 41
+    }
+
     private lateinit var world: World
+    private lateinit var gui: Gui
     private lateinit var player: Creature
     private lateinit var fov: FieldOfView
+    private lateinit var creatureFactory: CreatureFactory
     private var worldGenerated = false
+    private val messages = arrayListOf<String>()
 
     init {
         WorldBuilder(150, 100, 10).makeCaves()
@@ -33,20 +42,24 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
         world = w
         worldGenerated = true
         fov = FieldOfView(world)
-        val factory = StuffFactory(world)
-        createCreatures(factory)
+        creatureFactory = CreatureFactory(world)
+        player = creatureFactory.newPlayer(messages, fov)
+        gui = Gui(panel, player)
+        createCreatures()
         displayOutput()
     }
 
-    private fun createCreatures(factory: StuffFactory) {
-        player = factory.newPlayer(fov)
+    private fun createCreatures() {
+
     }
 
     override fun displayOutput() {
         panel.clear()
         if (worldGenerated) {
             displayTiles()
-            drawControls(panel, panel.panelWidth, panel.panelHeight)
+            gui.displayStats()
+            gui.displayMessages(messages)
+            drawControls(panel, PLAY_WIDTH, PLAY_HEIGHT)
         } else {
             panel.writeCenter("Generating world", 10)
         }
@@ -55,8 +68,8 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     private fun displayTiles() {
         fov.update(player.x, player.y, player.z, player.visionRadius)
 
-        for (x in 0 until panel.panelWidth) {
-            for (y in 0 until panel.panelHeight) {
+        for (x in 0 until PLAY_WIDTH) {
+            for (y in 0 until PLAY_HEIGHT) {
                 val wx = x + getScrollX()
                 val wy = y + getScrollY()
 
@@ -69,11 +82,11 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     }
 
     private fun getScrollX(): Int {
-        return Math.max(0, Math.min(player.x - panel.panelWidth / 2, world.width - panel.panelWidth))
+        return Math.max(0, Math.min(player.x - PLAY_WIDTH / 2, world.width - PLAY_WIDTH))
     }
 
     private fun getScrollY(): Int {
-        return Math.max(0, Math.min(player.y - panel.panelHeight / 2, world.height - panel.panelHeight))
+        return Math.max(0, Math.min(player.y - PLAY_HEIGHT / 2, world.height - PLAY_HEIGHT))
     }
 
     override fun respondToUserInput(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar): Screen {
