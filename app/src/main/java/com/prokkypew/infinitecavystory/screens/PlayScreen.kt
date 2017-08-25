@@ -2,16 +2,14 @@ package com.prokkypew.infinitecavystory.screens
 
 import android.graphics.Color
 import com.prokkypew.asciipanelview.AsciiPanelView
-import com.prokkypew.infinitecavystory.CreatureFactory
-import com.prokkypew.infinitecavystory.Gui
+import com.prokkypew.infinitecavystory.*
 import com.prokkypew.infinitecavystory.creatures.Creature
-import com.prokkypew.infinitecavystory.drawControls
-import com.prokkypew.infinitecavystory.handleControl
+import com.prokkypew.infinitecavystory.utils.getIntResource
 import com.prokkypew.infinitecavystory.world.FieldOfView
 import com.prokkypew.infinitecavystory.world.World
 import com.prokkypew.infinitecavystory.world.WorldBuilder
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 
 
 /**
@@ -32,14 +30,18 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     private val messages = arrayListOf<String>()
 
     init {
-        WorldBuilder(150, 100, 10).makeCaves()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::initWithWorld, Throwable::printStackTrace)
+        displayOutput()
+        async(UI) {
+            world = WorldBuilder(
+                    getIntResource(R.integer.world_width),
+                    getIntResource(R.integer.world_height),
+                    getIntResource(R.integer.world_depth))
+                    .makeCaves()
+            initWithWorld()
+        }
     }
 
-    private fun initWithWorld(w: World) {
-        world = w
+    private fun initWithWorld() {
         worldGenerated = true
         fov = FieldOfView(world)
         creatureFactory = CreatureFactory(world)
@@ -51,10 +53,10 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
 
     private fun createCreatures() {
         for (z in 0 until world.depth) {
-            for (i in 0..3) {
+            for (i in 0..getIntResource(R.integer.fungus_count)) {
                 creatureFactory.newFungus(z)
             }
-            for (i in 0..9) {
+            for (i in 0..getIntResource(R.integer.bats_count)) {
                 creatureFactory.newBat(z)
             }
         }
@@ -68,7 +70,7 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
             gui.displayMessages(messages)
             drawControls(panel, PLAY_WIDTH, PLAY_HEIGHT)
         } else {
-            panel.writeCenter("Generating world", 10)
+            panel.writeCenter("Generating world", panel.panelHeight / 2)
         }
     }
 

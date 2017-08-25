@@ -1,7 +1,10 @@
 package com.prokkypew.infinitecavystory.creatures.ai
 
 import com.prokkypew.infinitecavystory.CreatureFactory
+import com.prokkypew.infinitecavystory.R
 import com.prokkypew.infinitecavystory.creatures.Creature
+import com.prokkypew.infinitecavystory.utils.getFloatResource
+import com.prokkypew.infinitecavystory.utils.getIntResource
 
 
 /**
@@ -11,7 +14,8 @@ class FungusAi(creature: Creature, private val factory: CreatureFactory) : Creat
     private var spreadcount: Int = 0
 
     override fun onUpdate() {
-        if (spreadcount < 5 && Math.random() < 0.01)
+        if (spreadcount < getIntResource(R.integer.fungus_count)
+                && Math.random() < getFloatResource(R.dimen.fungus_spread_prob))
             spread()
     }
 

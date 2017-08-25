@@ -1,6 +1,7 @@
 package com.prokkypew.infinitecavystory.world
 
-import io.reactivex.Flowable
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.run
 import java.util.*
 
 
@@ -175,10 +176,7 @@ class WorldBuilder(private val width: Int, private val height: Int, private val 
         return this
     }
 
-    fun makeCaves(): Flowable<World> {
-        return Flowable.fromCallable<World> {
-            randomizeTiles().smooth(8).createRegions().connectRegions()
-                    .addExitStairs().build()
-        }
+    suspend fun makeCaves(): World = run(CommonPool) {
+        randomizeTiles().smooth(8).createRegions().connectRegions().addExitStairs().build()
     }
 }

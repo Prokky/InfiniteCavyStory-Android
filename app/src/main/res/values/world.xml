@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="world_width" type="integer">150</item>
+    <item name="world_height" type="integer">100</item>
+    <item name="world_depth" type="integer">10</item>
+
+    <item name="fungus_count" type="integer">3</item>
+    <item name="bats_count" type="integer">9</item>
+
+    <item name="player_hp" type="integer">100</item>
+    <item name="player_mana" type="integer">20</item>
+
+    <item name="fungus_hp" type="integer">10</item>
+    <item name="fungus_mana" type="integer">0</item>
+    <item name="fungus_spread_prob" format="float" type="dimen">0.01</item>
+    <item name="fungus_spread_limit" type="integer">3</item>
+
+    <item name="bat_hp" type="integer">15</item>
+    <item name="bat_mana" type="integer">5</item>
+</resources>

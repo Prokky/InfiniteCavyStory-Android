@@ -2,6 +2,7 @@ package com.prokkypew.infinitecavystory.screens
 
 import com.prokkypew.asciipanelview.AsciiPanelView
 import com.prokkypew.infinitecavystory.R
+import com.prokkypew.infinitecavystory.utils.getString
 
 /**
  * Created by prokk on 16.08.2017.
