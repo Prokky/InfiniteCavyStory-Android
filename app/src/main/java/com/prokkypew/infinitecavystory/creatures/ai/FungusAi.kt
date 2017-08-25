@@ -5,6 +5,7 @@ import com.prokkypew.infinitecavystory.R
 import com.prokkypew.infinitecavystory.creatures.Creature
 import com.prokkypew.infinitecavystory.utils.getFloatResource
 import com.prokkypew.infinitecavystory.utils.getIntResource
+import com.prokkypew.infinitecavystory.utils.getString
 
 
 /**
@@ -26,7 +27,7 @@ class FungusAi(creature: Creature, private val factory: CreatureFactory) : Creat
         if (!creature.canEnter(x, y, creature.z))
             return
 
-        creature.doAction("spawn a child")
+        creature.doAction(getString(R.string.message_spawn_child))
 
         val child = factory.newFungus(creature.z)
         child.x = x

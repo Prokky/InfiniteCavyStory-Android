@@ -3,4 +3,37 @@
     <string name="start_screen_header">INFINITE CAVY STORY</string>
     <string name="start_screen_middle_text">by Prokky</string>
     <string name="start_screen_bottom_text">-- click to start --</string>
+    <string name="generating_world">Generating world</string>
+
+    <string name="player">player</string>
+    <string name="fungus">fungus</string>
+    <string name="bat">bat</string>
+
+    <string name="gui_food">Food: %s</string>
+    <string name="gui_hp">%d/%d hp</string>
+    <string name="gui_mana">%d/%d mana</string>
+
+    <string name="prompt_tap_to_go_up">Tap to go up</string>
+    <string name="prompt_tap_to_go_down">Tap to go down</string>
+
+    <string name="message_generic">The %s %s.</string>
+    <string name="message_spawn_child">spawn a child</string>
+    <string name="message_walk_up_stairs">walk up the stairs to level %d</string>
+    <string name="message_walk_up_stairs_error">try to go up but are stopped by the cave ceiling</string>
+    <string name="message_walk_down_stairs">walk down the stairs to level %d</string>
+    <string name="message_walk_down_stairs_error">try to go down but are stopped by the cave floor</string>
+    <string name="message_attack">attack the %s for %d damage</string>
+    <string name="message_killed_by">Killed by a %s</string>
+    <string name="message_modify_xp">You %s %d xp.</string>
+    <string name="message_levelup">advance to level %d</string>
+    <string name="message_levelup_error">Died from having a negative level?</string>
+    <string name="message_gain">gain</string>
+    <string name="message_lose">lose</string>
+    <string name="message_die">die</string>
+
+    <string name="food_starving">Starving</string>
+    <string name="food_hungry">Hungry</string>
+    <string name="food_stuffed">Stuffed</string>
+    <string name="food_full">Full</string>
+    <string name="food_fine">Fine</string>
 </resources>

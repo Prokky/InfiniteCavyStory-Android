@@ -27,6 +27,5 @@ class MainActivity : AppCompatActivity(), AsciiPanelView.OnCharClickedListener {
 
     override fun onCharClicked(x: Int?, y: Int?, char: AsciiPanelView.ColoredChar) {
         currentScreen = currentScreen.respondToUserInput(x, y, char)
-        currentScreen.displayOutput()
     }
 }

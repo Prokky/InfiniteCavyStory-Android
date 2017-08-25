@@ -2,10 +2,13 @@ package com.prokkypew.infinitecavystory.screens
 
 import android.graphics.Color
 import com.prokkypew.asciipanelview.AsciiPanelView
-import com.prokkypew.infinitecavystory.*
+import com.prokkypew.infinitecavystory.Gui
+import com.prokkypew.infinitecavystory.R
 import com.prokkypew.infinitecavystory.creatures.Creature
 import com.prokkypew.infinitecavystory.utils.getIntResource
+import com.prokkypew.infinitecavystory.utils.getString
 import com.prokkypew.infinitecavystory.world.FieldOfView
+import com.prokkypew.infinitecavystory.world.Tile
 import com.prokkypew.infinitecavystory.world.World
 import com.prokkypew.infinitecavystory.world.WorldBuilder
 import kotlinx.coroutines.experimental.android.UI
@@ -25,7 +28,6 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     private lateinit var gui: Gui
     private lateinit var player: Creature
     private lateinit var fov: FieldOfView
-    private lateinit var creatureFactory: CreatureFactory
     private var worldGenerated = false
     private val messages = arrayListOf<String>()
 
@@ -44,22 +46,12 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
     private fun initWithWorld() {
         worldGenerated = true
         fov = FieldOfView(world)
-        creatureFactory = CreatureFactory(world)
-        player = creatureFactory.newPlayer(messages, fov)
-        gui = Gui(panel, player)
-        createCreatures()
-        displayOutput()
-    }
 
-    private fun createCreatures() {
-        for (z in 0 until world.depth) {
-            for (i in 0..getIntResource(R.integer.fungus_count)) {
-                creatureFactory.newFungus(z)
-            }
-            for (i in 0..getIntResource(R.integer.bats_count)) {
-                creatureFactory.newBat(z)
-            }
-        }
+        world.createCreatures()
+        player = world.createPlayer(messages, fov)
+
+        gui = Gui(panel, player)
+        displayOutput()
     }
 
     override fun displayOutput() {
@@ -68,9 +60,10 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
             displayTiles()
             gui.displayStats()
             gui.displayMessages(messages)
-            drawControls(panel, PLAY_WIDTH, PLAY_HEIGHT)
+            gui.displayControls(panel, PLAY_WIDTH, PLAY_HEIGHT)
+            // gui.displayPrompt()
         } else {
-            panel.writeCenter("Generating world", panel.panelHeight / 2)
+            panel.writeCenter(getString(R.string.generating_world), panel.panelHeight / 2)
         }
     }
 
@@ -102,9 +95,26 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
         if (!worldGenerated)
             return this
 
-        handleControl(char.char, player)
+        gui.handleControl(x!!, y!!, char.char, player)
 
         displayOutput()
+        checkPlayerPosition()
         return this
+    }
+
+    private fun checkPlayerPosition() {
+        if (world.tile(player.x, player.y, player.z) == Tile.STAIRS_UP) {
+            gui.showPrompt(getString(R.string.prompt_tap_to_go_up), object : Gui.OnPromptClick {
+                override fun onPromptClick() {
+                    player.moveBy(0, 0, -1)
+                }
+            })
+        } else if (world.tile(player.x, player.y, player.z) == Tile.STAIRS_DOWN) {
+            gui.showPrompt(getString(R.string.prompt_tap_to_go_down), object : Gui.OnPromptClick {
+                override fun onPromptClick() {
+                    player.moveBy(0, 0, 1)
+                }
+            })
+        }
     }
 }

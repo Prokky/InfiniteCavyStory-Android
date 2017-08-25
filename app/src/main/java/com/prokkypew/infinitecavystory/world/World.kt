@@ -1,6 +1,9 @@
 package com.prokkypew.infinitecavystory.world
 
+import com.prokkypew.infinitecavystory.CreatureFactory
+import com.prokkypew.infinitecavystory.R
 import com.prokkypew.infinitecavystory.creatures.Creature
+import com.prokkypew.infinitecavystory.utils.getIntResource
 
 
 /**
@@ -11,6 +14,7 @@ class World(private val tiles: Array<Array<Array<Tile>>>) {
     val height = tiles[0].size
     val depth = tiles[0][0].size
     private val creatures = ArrayList<Creature>()
+    private val creatureFactory = CreatureFactory(this)
 
     fun addAtEmptyLocation(creature: Creature, z: Int) {
         var x: Int
@@ -63,5 +67,20 @@ class World(private val tiles: Array<Array<Array<Tile>>>) {
             return creature.color
 
         return tile(x, y, z).color()
+    }
+
+    fun createCreatures() {
+        for (z in 0 until depth) {
+            for (i in 0..getIntResource(R.integer.fungus_count)) {
+                creatureFactory.newFungus(z)
+            }
+            for (i in 0..getIntResource(R.integer.bats_count)) {
+                creatureFactory.newBat(z)
+            }
+        }
+    }
+
+    fun createPlayer(messages: ArrayList<String>, fov: FieldOfView): Creature {
+        return creatureFactory.newPlayer(messages, fov)
     }
 }

@@ -1,6 +1,8 @@
 package com.prokkypew.infinitecavystory.creatures
 
+import com.prokkypew.infinitecavystory.R
 import com.prokkypew.infinitecavystory.creatures.ai.CreatureAi
+import com.prokkypew.infinitecavystory.utils.getString
 import com.prokkypew.infinitecavystory.world.Tile
 import com.prokkypew.infinitecavystory.world.World
 
@@ -31,16 +33,16 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
 
         if (mz == -1) {
             if (tile === Tile.STAIRS_DOWN) {
-                doAction("walk up the stairs to level %d", z + mz + 1)
+                doAction(getString(R.string.message_walk_up_stairs), z + mz + 1)
             } else {
-                doAction("try to go up but are stopped by the cave ceiling")
+                doAction(getString(R.string.message_walk_up_stairs_error))
                 return
             }
         } else if (mz == 1) {
             if (tile === Tile.STAIRS_UP) {
-                doAction("walk down the stairs to level %d", z + mz + 1)
+                doAction(getString(R.string.message_walk_down_stairs), z + mz + 1)
             } else {
-                doAction("try to go down but are stopped by the cave floor")
+                doAction(getString(R.string.message_walk_down_stairs_error))
                 return
             }
         }
@@ -54,7 +56,7 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
     }
 
     private fun meleeAttack(other: Creature) {
-        commonAttack(other, attackValue(), "attack the %s for %d damage", other.name)
+        commonAttack(other, attackValue(), getString(R.string.message_attack), other.name)
     }
 
     private fun commonAttack(other: Creature, attack: Int, action: String, vararg params: Any) {
@@ -64,7 +66,7 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
 
         doAction(action, *params, amount)
 
-        other.modifyHp(-amount, "Killed by a " + name)
+        other.modifyHp(-amount, String.format(getString(R.string.message_killed_by), name))
 
         if (other.hp < 1)
             gainXp(other)
@@ -73,13 +75,13 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
     private fun modifyXp(amount: Int) {
         xp += amount
 
-        notify("You %s %d xp.", if (amount < 0) "lose" else "gain", amount)
+        notify(getString(R.string.message_modify_xp), if (amount < 0) getString(R.string.message_lose) else getString(R.string.message_gain), amount)
 
         while (xp > (Math.pow(level.toDouble(), 1.75) * 25).toInt()) {
             level++
-            doAction("advance to level %d", level)
+            doAction(getString(R.string.message_levelup), level)
             ai?.onGainLevel()
-            modifyHp(level * 2, "Died from having a negative level?")
+            modifyHp(level * 2, getString(R.string.message_levelup_error))
         }
     }
 
@@ -90,7 +92,7 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
         if (hp > maxHp) {
             hp = maxHp
         } else if (hp < 1) {
-            doAction("die")
+            doAction(getString(R.string.message_die))
             world.remove(this)
         }
     }
@@ -132,11 +134,11 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
 
     fun hunger(): String {
         return when {
-            food < maxFood * 0.10 -> "Starving"
-            food < maxFood * 0.25 -> "Hungry"
-            food > maxFood * 0.90 -> "Stuffed"
-            food > maxFood * 0.75 -> "Full"
-            else -> "Fine"
+            food < maxFood * 0.10 -> getString(R.string.food_starving)
+            food < maxFood * 0.25 -> getString(R.string.food_hungry)
+            food > maxFood * 0.90 -> getString(R.string.food_stuffed)
+            food > maxFood * 0.75 -> getString(R.string.food_full)
+            else -> getString(R.string.food_fine)
         }
     }
 
@@ -149,8 +151,7 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
             if (other === this) {
                 other.notify("You $message.", *params)
             } else {
-                other.notify(String.format("The %s %s.", name,
-                        makeSecondPerson(message)), *params)
+                other.notify(String.format(getString(R.string.message_generic), name, makeSecondPerson(message)), *params)
             }
         }
     }
