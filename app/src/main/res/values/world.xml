@@ -4,7 +4,7 @@
     <item name="world_height" type="integer">100</item>
     <item name="world_depth" type="integer">10</item>
 
-    <item name="fungus_count" type="integer">3</item>
+    <item name="fungus_count" type="integer">2</item>
     <item name="bats_count" type="integer">9</item>
 
     <item name="player_hp" type="integer">100</item>

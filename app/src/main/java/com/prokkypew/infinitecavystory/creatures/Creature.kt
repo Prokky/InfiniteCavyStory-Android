@@ -2,6 +2,7 @@ package com.prokkypew.infinitecavystory.creatures
 
 import com.prokkypew.infinitecavystory.R
 import com.prokkypew.infinitecavystory.creatures.ai.CreatureAi
+import com.prokkypew.infinitecavystory.items.Inventory
 import com.prokkypew.infinitecavystory.utils.getString
 import com.prokkypew.infinitecavystory.world.Tile
 import com.prokkypew.infinitecavystory.world.World
@@ -12,6 +13,7 @@ import com.prokkypew.infinitecavystory.world.World
  */
 class Creature(private val world: World, val glyph: Char, val color: Int, val name: String, var maxHp: Int, var maxMana: Int, var defense: Int) {
 
+    var inventory = Inventory(20)
     var x: Int = 0
     var y: Int = 0
     var z: Int = 0
@@ -196,5 +198,17 @@ class Creature(private val world: World, val glyph: Char, val color: Int, val na
         }
 
         return builder.toString().trim { it <= ' ' }
+    }
+
+    fun pickup() {
+        val item = world.item(x, y, z)
+
+        if (inventory.isFull || item == null) {
+            doAction(getString(R.string.grab_at_ground))
+        } else {
+            doAction(getString(R.string.pickup), item.appearance())
+            world.removeItem(x, y, z)
+            inventory.add(item)
+        }
     }
 }

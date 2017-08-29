@@ -2,7 +2,6 @@ package com.prokkypew.infinitecavystory.screens
 
 import android.graphics.Color
 import com.prokkypew.asciipanelview.AsciiPanelView
-import com.prokkypew.infinitecavystory.Gui
 import com.prokkypew.infinitecavystory.R
 import com.prokkypew.infinitecavystory.creatures.Creature
 import com.prokkypew.infinitecavystory.utils.getIntResource
@@ -48,7 +47,7 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
         fov = FieldOfView(world)
 
         player = world.createPlayer(messages, fov)
-        world.createCreatures(player)
+        world.fill(player)
 
         gui = Gui(panel, player)
         displayOutput()
@@ -112,6 +111,12 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
             gui.showPrompt(getString(R.string.prompt_tap_to_go_down), object : Gui.OnPromptClick {
                 override fun onPromptClick() {
                     player.moveBy(0, 0, 1)
+                }
+            })
+        } else if (world.item(player.x, player.y, player.z) != null) {
+            gui.showPrompt(String.format(getString(R.string.prompt_pickup), world.item(player.x, player.y, player.z)!!.appearance()), object : Gui.OnPromptClick {
+                override fun onPromptClick() {
+                    player.pickup()
                 }
             })
         }

@@ -1,6 +1,7 @@
-package com.prokkypew.infinitecavystory
+package com.prokkypew.infinitecavystory.world
 
 import android.graphics.Color
+import com.prokkypew.infinitecavystory.R
 import com.prokkypew.infinitecavystory.creatures.Creature
 import com.prokkypew.infinitecavystory.creatures.ai.BatAi
 import com.prokkypew.infinitecavystory.creatures.ai.FungusAi
@@ -8,8 +9,6 @@ import com.prokkypew.infinitecavystory.creatures.ai.PlayerAi
 import com.prokkypew.infinitecavystory.creatures.ai.ZombieAi
 import com.prokkypew.infinitecavystory.utils.getIntResource
 import com.prokkypew.infinitecavystory.utils.getString
-import com.prokkypew.infinitecavystory.world.FieldOfView
-import com.prokkypew.infinitecavystory.world.World
 
 
 /**
@@ -38,7 +37,7 @@ class CreatureFactory(private val world: World) {
     }
 
     fun newZombie(depth: Int, player: Creature): Creature {
-        val zombie = Creature(world, 'z', Color.WHITE, "zombie", 50, 10, 10)
+        val zombie = Creature(world, 'z', Color.WHITE, getString(R.string.zombie), 50, 10, 10)
         zombie.ai = ZombieAi(zombie, player)
         world.addAtEmptyLocation(zombie, depth)
         return zombie

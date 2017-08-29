@@ -8,6 +8,7 @@
     <string name="player">player</string>
     <string name="fungus">fungus</string>
     <string name="bat">bat</string>
+    <string name="zombie">zombie</string>
 
     <string name="gui_food">Food: %s</string>
     <string name="gui_hp">%d/%d hp</string>
@@ -15,6 +16,7 @@
 
     <string name="prompt_tap_to_go_up">Tap to go up</string>
     <string name="prompt_tap_to_go_down">Tap to go down</string>
+    <string name="prompt_pickup">Pickup %s</string>
 
     <string name="message_generic">The %s %s.</string>
     <string name="message_spawn_child">spawn a child</string>
@@ -36,4 +38,20 @@
     <string name="food_stuffed">Stuffed</string>
     <string name="food_full">Full</string>
     <string name="food_fine">Fine</string>
+
+    <string name="grab_at_ground">grab at the ground</string>
+    <string name="pickup">pickup a %s</string>
+
+    <string name="rock">rock</string>
+    <string name="bread">bread</string>
+    <string name="apple">apple</string>
+    <string name="teddy_bear">teddy bear</string>
+    <string name="baguette">baguette</string>
+    <string name="dagger">dagger</string>
+    <string name="sword">sword</string>
+    <string name="staff">staff</string>
+    <string name="bow">bow</string>
+    <string name="tunic">tunic</string>
+    <string name="chainmail">chainmail</string>
+    <string name="platemail">platemail</string>
 </resources>

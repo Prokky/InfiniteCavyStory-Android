@@ -1,9 +1,9 @@
-package com.prokkypew.infinitecavystory
+package com.prokkypew.infinitecavystory.screens
 
 import android.graphics.Color
 import com.prokkypew.asciipanelview.AsciiPanelView
+import com.prokkypew.infinitecavystory.R
 import com.prokkypew.infinitecavystory.creatures.Creature
-import com.prokkypew.infinitecavystory.screens.PlayScreen
 import com.prokkypew.infinitecavystory.utils.getString
 
 
