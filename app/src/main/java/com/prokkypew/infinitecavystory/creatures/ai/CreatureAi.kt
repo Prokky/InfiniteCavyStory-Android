@@ -2,6 +2,7 @@ package com.prokkypew.infinitecavystory.creatures.ai
 
 import com.prokkypew.infinitecavystory.creatures.Creature
 import com.prokkypew.infinitecavystory.world.Line
+import com.prokkypew.infinitecavystory.world.Path
 import com.prokkypew.infinitecavystory.world.Tile
 
 
@@ -45,6 +46,15 @@ open class CreatureAi(protected var creature: Creature) {
             return
         else
             creature.moveBy(mx, my, 0)
+    }
+
+    fun hunt(target: Creature) {
+        val points = Path(creature, target.x, target.y).points()
+
+        val mx = points?.get(0)!!.x - creature.x
+        val my = points[0].y - creature.y
+
+        creature.moveBy(mx, my, 0)
     }
 
     open fun onGainLevel() {

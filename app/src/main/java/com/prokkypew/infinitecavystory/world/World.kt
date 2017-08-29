@@ -69,13 +69,16 @@ class World(private val tiles: Array<Array<Array<Tile>>>) {
         return tile(x, y, z).color()
     }
 
-    fun createCreatures() {
+    fun createCreatures(player: Creature) {
         for (z in 0 until depth) {
             for (i in 0..getIntResource(R.integer.fungus_count)) {
                 creatureFactory.newFungus(z)
             }
             for (i in 0..getIntResource(R.integer.bats_count)) {
                 creatureFactory.newBat(z)
+            }
+            for (i in 0 until z * 2 + 10) {
+                creatureFactory.newZombie(z, player)
             }
         }
     }

@@ -10,7 +10,7 @@ import com.prokkypew.infinitecavystory.world.World
 /**
  * Created by alexander.roman on 17.08.2017.
  */
-class Creature(private val world: World, val glyph: Char, val color: Int, val name: String, var maxHp: Int, var maxMana: Int) {
+class Creature(private val world: World, val glyph: Char, val color: Int, val name: String, var maxHp: Int, var maxMana: Int, var defense: Int) {
 
     var x: Int = 0
     var y: Int = 0

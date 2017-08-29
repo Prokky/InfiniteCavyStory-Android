@@ -47,8 +47,8 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
         worldGenerated = true
         fov = FieldOfView(world)
 
-        world.createCreatures()
         player = world.createPlayer(messages, fov)
+        world.createCreatures(player)
 
         gui = Gui(panel, player)
         displayOutput()
@@ -61,7 +61,6 @@ class PlayScreen(panelView: AsciiPanelView) : Screen(panelView) {
             gui.displayStats()
             gui.displayMessages(messages)
             gui.displayControls(panel, PLAY_WIDTH, PLAY_HEIGHT)
-            // gui.displayPrompt()
         } else {
             panel.writeCenter(getString(R.string.generating_world), panel.panelHeight / 2)
         }
